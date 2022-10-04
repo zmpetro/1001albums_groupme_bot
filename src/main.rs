@@ -90,14 +90,14 @@ fn get_message(album: &Album, generator_group_url: &str) -> String {
 
 fn send_message(
     client: &Client,
-    bot_id: String,
-    message: String,
+    bot_id: &str,
+    message: &str,
     retry_limit: u8,
     sleep_secs: u64,
 ) -> Result<(), reqwest::Error> {
     let json = Message {
-        bot_id: bot_id,
-        text: message,
+        bot_id: bot_id.to_string(),
+        text: message.to_string(),
     };
 
     let mut retry: u8 = 0;
@@ -108,7 +108,10 @@ fn send_message(
             .send()?
             .error_for_status();
         match resp {
-            Ok(_) => return Ok(()),
+            Ok(_) => {
+                println!("Message sent:\n{}", message);
+                return Ok(());
+            }
             Err(e) => {
                 if retry < retry_limit {
                     retry += 1;
@@ -148,6 +151,6 @@ fn main() {
     let generator_group_url = format!("{}/groups/{}", GENERATOR_URL, group);
     let message = get_message(&album, &generator_group_url);
 
-    send_message(&client, bot_id, message, retry_limit, sleep_secs)
+    send_message(&client, &bot_id, &message, retry_limit, sleep_secs)
         .expect("Could not send message");
 }
