@@ -9,12 +9,11 @@ const GENERATOR_URL: &str = "https://1001albumsgenerator.com";
 const GROUPME_API_URL: &str = "https://api.groupme.com/v3/bots/post";
 const SPOTIFY_URL: &str = "https://open.spotify.com/album";
 
-#[derive(Debug)]
 struct Album {
-    album: String,
     artist: String,
+    name: String,
     release_year: String,
-    spotify_link: String,
+    spotify_id: String,
 }
 
 #[derive(Serialize)]
@@ -36,17 +35,16 @@ fn get_album(
             Ok(r) => {
                 let json = r.json::<serde_json::Value>()?;
                 let album = Album {
-                    album: json["currentAlbum"]["name"].as_str().unwrap().to_string(),
                     artist: json["currentAlbum"]["artist"].as_str().unwrap().to_string(),
+                    name: json["currentAlbum"]["name"].as_str().unwrap().to_string(),
                     release_year: json["currentAlbum"]["releaseDate"]
                         .as_str()
                         .unwrap()
                         .to_string(),
-                    spotify_link: format!(
-                        "{}/{}",
-                        SPOTIFY_URL,
-                        json["currentAlbum"]["spotifyId"].as_str().unwrap()
-                    ),
+                    spotify_id: json["currentAlbum"]["spotifyId"]
+                        .as_str()
+                        .unwrap()
+                        .to_string(),
                 };
                 return Ok(album);
             }
@@ -78,10 +76,10 @@ fn get_message(album: &Album, generator_group_url: &str) -> String {
         dt.month(),
         dt.day(),
         dt.year(),
-        album.album,
+        album.name,
         album.artist,
         album.release_year,
-        album.spotify_link,
+        format!("{}/{}", SPOTIFY_URL, album.spotify_id),
         generator_group_url,
     );
 
