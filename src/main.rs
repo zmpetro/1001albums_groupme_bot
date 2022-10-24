@@ -68,7 +68,7 @@ fn get_album(
 fn get_message(album: &Album, generator_group_url: &str) -> String {
     let dt = Local::now();
 
-    let message = format!(
+    format!(
         "1001albumsgenerator {}/{}/{}\n\n\
         {} by {} ({})\n\n\
         {}\n\n\
@@ -81,9 +81,7 @@ fn get_message(album: &Album, generator_group_url: &str) -> String {
         album.release_year,
         format!("{}/{}", SPOTIFY_URL, album.spotify_id),
         generator_group_url,
-    );
-
-    return message;
+    )
 }
 
 fn send_message(
